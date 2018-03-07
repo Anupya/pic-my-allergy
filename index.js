@@ -22,9 +22,6 @@ app.get('/', function(req, res) {
 		);
 
 	res.render(__dirname + '/index.html', {
-		/* specialized content for each person like in Facebook */
-		'welcomeMessage': 'Hello StarterHacks',
-
 		/* going to display the messages */
 		'allergies': allergies
 	});
@@ -32,31 +29,37 @@ app.get('/', function(req, res) {
 
 /* prints any submitted messages on the web app to the terminal */
 app.get('/allergies', function(req, res) {
-	console.log(req.query.allergies);
 
 	/* read from json file */
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
 	/* change to javascript */
-	if (req.query.allergies != '') {
-		allergies.push(req.query);
-	}
-	
-	/* update it */
-	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
+	var commaSeparatedAllergies = req.query.allergies.toString();
+	var allergies_arr = commaSeparatedAllergies.split(',');
 
+	for (i = 0; i < allergies_arr.length; i++) {
+		console.log(allergies_arr[i]);
+		allergies.push(allergies_arr[i])
+	}
+
+	console.log("THESE ARE ALLERGIES SO FAR: " + allergies);
+	console.log("STRINGIFIED VERSION OF ALLERGIES SO FAR: " + JSON.stringify(allergies));
+
+	/* updates the webpage */
+	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
+	
 	/* actually refreshes the webpage to show the updated one */
 	res.redirect('/');
 })
 
-/* reset
+/* reset */
 app.get('/reset', function(req, res) {
+	console.log("YOU ARE IN RESET");
 	fs.writeFile('allergies.json', 0, function() {console.log('done')})
 	allergies.push(req.query);
 	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
 	res.redirect('/');
 })
-*/
 
 
 /* host the website */

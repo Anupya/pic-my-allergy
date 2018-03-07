@@ -3,24 +3,26 @@
 	Pic My Allergy
 </h1>
 <body>
-	<form>
-		Write your allergies (separated by commas): 
+	<form action='allergies'>
+		List your allergies (separated by commas): 
 		<br>
 		<textarea type='text' name="allergies"></textarea>
 		<br>
-		<input type='submit' value='Submit' action='allergies'>
+		<input type='submit' value='Submit'>
 	</form>
 	<br>
 	<br>
-	<h3> My allergies </h3>
-	<ul>
-		<!-- separate them based on commas -->
-		{{#each allergies}} <!-- syntax for for loop -->
-			<li>
-				{{this.allergies}}
-			</li>
-		{{/each}}
-	</ul>
-	<input type='reset' value='Clear' action='reset'>
+	<form action='reset'>
+		<h3> My allergies </h3>
+		<ul>
+			<!-- separate them based on commas -->
+			{{#each allergies}} <!-- syntax for for loop -->
+				<li>
+					{{this.allergies}}
+				</li>
+			{{/each}}
+		</ul>
+		<input type='reset' value='Clear'>
+	</form>
 </body>
 </html>
