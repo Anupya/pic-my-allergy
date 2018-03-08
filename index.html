@@ -3,7 +3,7 @@
 	Pic My Allergy
 </h1>
 <body>
-	<form action='allergies'>
+	<form action='allergy'>
 		List your allergies (separated by commas): 
 		<br>
 		<textarea type='text' name="allergies"></textarea>
@@ -11,7 +11,7 @@
 		<input type='submit' value='Submit'>
 	</form>
 	<br>
-	<br>
+
 	<form action='reset'>
 		<h3> My allergies </h3>
 		<ul>
@@ -22,7 +22,17 @@
 				</li>
 			{{/each}}
 		</ul>
-		<input type='reset' value='Clear'>
+		<input type='submit' value='Clear'>
 	</form>
+	<br>
+
+	<form action='upload'>
+		<h3> Upload your image here </h3>
+		<input type='file' value='image'> <br><br>
+		<input type='submit' value='Submit'>
+	</form>
+
+	<!-- <img src="/image.png" /> -->
+
 </body>
 </html>
