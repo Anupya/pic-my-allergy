@@ -3,6 +3,7 @@
 	Pic My Allergy
 </h1>
 <body>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<form action='allergy'>
 		List your allergies (separated by commas): 
 		<br>
@@ -26,13 +27,11 @@
 	</form>
 	<br>
 
-	<form action='upload'>
+	<form id='frmUploader' action='upload' method='post' enctype="multipart/form-data">
 		<h3> Upload your image here </h3>
-		<input type='file' value='image'> <br><br>
-		<input type='submit' value='Submit'>
+		<input id="the-file-input" type='file' name="imgUploader"> <br><br>
+		<input type='submit' value='Upload'>
 	</form>
-
-	<!-- <img src="/image.png" /> -->
 
 </body>
 </html>
