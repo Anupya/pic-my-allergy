@@ -7,6 +7,8 @@
 	<form action='allergy'>
 		List your allergies (separated by commas): 
 		<br>
+		Ex: tomatoes, eggs, peanuts
+		<br><br>
 		<textarea type='text' name="allergies"></textarea>
 		<br>
 		<input type='submit' value='Submit'>
@@ -29,9 +31,29 @@
 
 	<form id='frmUploader' action='upload' method='post' enctype="multipart/form-data">
 		<h3> Upload your image here </h3>
-		<input id="the-file-input" type='file' name="imgUploader"> <br><br>
-		<input type='submit' value='Upload'>
+		<input id="the-file-input" type='file' name="imgUploader" onchange="renderImage(this.files[0])"> 
+		<p id="preview"></p>
+		<script>
+			function renderImage (file) { // using HTML5 File API which reduces load on the server
+				var reader = new FileReader();
+
+				reader.onload = function(event) {
+					the_url = event.target.result;
+					console.log("the_url: " + the_url);
+					$('#preview').html("Preview: <br><br><img src='" + the_url + "'" + "style='max-width:175px;max-length:175px' />");
+				}
+
+				console.log("file: " + file);
+
+				reader.readAsDataURL(file);
+			}
+		</script>
+		<br><br>
+		<input id="upload" type='submit' value='Upload' onchange="renderImage(this.files[0])">
 	</form>
 
+	<form id="amIAllergic" action='amIAllergic' method='post'>
+		<input type="submit" value="Am I allergic?">
+	</form>
 </body>
 </html>

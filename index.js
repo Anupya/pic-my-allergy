@@ -67,83 +67,75 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
-/*
-$("#the-file-input").change(function() {
-	console.log("photo file has been chosen");
-	//grab the first image in the fileList
-	//in this example we are only loading one file.
-	console.log(this.files[0].size);
-	console.log(this.files[0]);
-	renderImage(this.files[0]);
-});
-*/
-
-/* req is undefined */
 app.post('/upload', function(req, res){
-	console.log("IN UPLOADS");
-	// clear the uploads directory
+	console.log("IN app.post('/upload', ...)");
+	
+	// clear the uploads directory before uploading this new photo
 	rimraf('./uploads/*', function() {});
 
     // create an incoming form object
     var form = new formidable.IncomingForm();
 
-    // specify that we want to allow the user to upload multiple files in a single request
-    // form.multiples = true;
-
-    // store all uploads in the /uploads directory
+    // DO NOT COMMENT THIS OUT
     form.uploadDir = path.join(__dirname, '/uploads');
+    form.keepExtensions = false;
 
-    // every time a file has been uploaded successfully,
-    // rename it to it's orignal name
+    form.on('progress', function(bytesReceived, bytesExpected) {
+    	// write your own progress bar here later
+    	console.log("IN PROGRESS");
+
+    	if (bytesReceived > 100000) {
+    		console.log("TOO BIG!");
+    		return false;
+    	}
+    	
+    });
+
+    // rename the file to its original name after it has been uploaded
     form.on('file', function(field, file) {
+    	console.log("file.size: " + file.size);
+    	if (file.size > 2000000) {
+    		console.log("exceeded file size: " + file.size);
 
-  	  if ((file.name.split('.').pop() == 'jpg') || 
-  		  (file.name.split('.').pop() == 'png')) {
-  			  var ext = "png";
-  			  fs.rename(file.path, path.join(form.uploadDir, ("image." + ext)));
-  	  }
-  	  else {
-  		  res.end("Sorry, we only accept JPGs and PNGs");
-  	  }
+    		// inform html code
+    		res.redirect('/');
+    	}
+
+        console.log("INSIDE FORM.ON");
+
+  	    if ((file.name.split('.').pop() != 'jpg') && 
+  		         (file.name.split('.').pop() != 'png'))  {
+  	    	res.end("Sorry, we only accept JPGs and PNGs");
+  	    }
+
+  	    else {
+  		    var ext = "png";
+  			console.log("FILE IS VALID");
+			fs.rename(file.path, path.join(form.uploadDir, ("image." + ext)));
+  	    }
     });
 
-    // log any errors that occur
     form.on('error', function(err) {
-      console.log('An error has occurred: \n' + err);
+        console.log('An error has occurred: \n' + err);
     });
 
-    // once all the files have been uploaded, send a response to the client
     form.on('end', function() {
     	console.log("SUCCESS");
-    	// renderImage(req.file);
+    	// print success message on screen
     });
 
     // parse the incoming request containing the form data
     form.parse(req);
-    console.log("ABOUT TO DISPLAY IMAGE FILE ");
 
-    // display image file to browser 
-    //renderImage('./uploads/image.png');
-    //console.log("RENDER IMAGE HAS RUN");
-    //res.redirect('/');
+    res.redirect('/');
 });
 
-function renderImage (file) {
-	var reader = new FileReader();
+app.post('/amIAllergic', function(req, res) {
+	console.log("INSIDE AMIALLERGIC");
+	res.redirect('/');
 
-	reader.onload = function(event) {
-		the_url = event.target.result;
-		console.log("the_url: " + the_url);
-		$('#frmUploader').html("<img src='" + the_url + "' />");
-	}
-
-	reader.readAsDataURL(file);
-
-	$('#the-file-input').change(function() {
-		console.log(this.files);
-		renderImage(this.files[0]);
-	});
-}
+	/* MACHINE LEARNING */
+});
 
 /* host the website */
 http.listen(3000, function() {
