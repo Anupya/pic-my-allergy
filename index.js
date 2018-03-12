@@ -1,3 +1,9 @@
+const Clarifai = require('clarifai');
+
+const MLApp = new Clarifai.App({
+ apiKey: 'bcdc87e24b314c9d9d4dae72d641b65b'
+});
+
 /* define our application and instantiate Express */
 var express = require('express');
 var app = express();
@@ -67,7 +73,8 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
-app.post('/upload', function(req, res){
+app.post('/upload', function(req, res){ /* use https://github.com/mattyork/fuzzy to get user input */
+
 	console.log("IN app.post('/upload', ...)");
 	
 	// clear the uploads directory before uploading this new photo
@@ -132,23 +139,88 @@ app.post('/upload', function(req, res){
 
 app.post('/amIAllergic', function(req, res) {
 	console.log("INSIDE AMIALLERGIC");
-	res.redirect('/');
 
 	/* MACHINE LEARNING */
+	MLApp.models.predict ("bd367be194cf45149e75f01d59f77ba7", "http://www.coca-colacompany.com/content/dam/journey/us/en/private/2017/04/BravesFood1.rendition.940.456.jpg").then(
+	    function(response) {
+	    	// get the data from API response and do something here
+	    	console.log("Model Name: " + response.rawData.outputs[0].model.name);
+
+	    	if (response.rawData.outputs[0].data.hasOwnProperty("concepts")) {
+	    		console.log("CONCEPTS TAG EXISTS");
+	    		dataArray = response.rawData.outputs[0].data.concepts;
+	    		console.log("DATAARRAY.LENGTH: " + dataArray.length);
+
+	    		var tagArray = new Array(dataArray.length);
+	    		var probabilityArray = new Array(dataArray.length);
+
+	    		for (var num = 0; num < dataArray.length; num++) {
+	    			tagArray[num] = dataArray[num].name;
+	    			probabilityArray[num] = dataArray[num].value;
+	    			console.log("tagArray[" + num + "] = " + tagArray[num]);
+	    			console.log("probabilityArray[" + num + "] = " + probabilityArray[num]);
+	    		}
+
+	    		var allergiesJSON = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
+
+	    		/* if anything in allergies list, matches tag array, output it to screen */
+
+	    		var allergies = new Array(allergiesJSON.length);
+	    		for (var i = 0; i < allergiesJSON.length; i++) {
+	    			allergies[i] = allergiesJSON[i].allergies;
+	    			allergies[i].trim();
+	    			console.log("allergies[" + i + "]: " + allergies[i]);
+	    		}
+
+	    		var edible = true;
+	    		var canteatbecause = {};
+
+	    		/* compare allergies and tagArray */
+
+	    		// ERROR: does not work because JSON.parse creates a leading whitespace so it
+	    		// does not match the string and does not give an allergy alert
+
+	    		for (var a = 0; a < tagArray.length; a++) {
+	    			console.log("-----------------------");
+	    			console.log("a = " + a);
+	    			for (var b = 0; b < allergies.length; b++) {
+	    				if (tagArray[a] == allergies[b]) {
+	    					console.log("YOU ARE ALLERGIC TO: " + tagArray[a]);
+	    					canteatbecause[tagArray[a]] = probabilityArray[a];
+	    					console.log("# reasons you cant eat this: " + Object.keys(canteatbecause).length);
+	    					edible = false;
+	    				}
+	    				console.log("TAG: " + tagArray[a] + " & ALLERGY: " + allergies[b]);
+	    			}
+	    		}
+
+	    		if (edible) {
+	    			console.log("IT IS EDIBLE");
+	    		}
+	    		else {
+	    			console.log("IT IS NOT EDIBLE BECAUSE");
+	    			console.log("# reasons you cant eat this: " + Object.keys(canteatbecause).length);
+	    			
+	    			for (var i = 0; i < Object.keys(canteatbecause).length; i++) {
+	    				console.log("Your food has a " + Math.round(Object.values(canteatbecause)[i]*100) + 
+	    					"% chance of having " + Object.keys(canteatbecause)[i]);
+	    			}
+	    		}
+	    	}
+	    	res.redirect('/');
+	      
+	    },
+
+	   	// there was an error
+	    function(err) {
+	    	console.log(err);
+
+	    }
+	);
+
 });
 
 /* host the website */
 http.listen(3000, function() {
 	console.log("Running on localhost:3000");
 })
-
-/* FOOD MODEL 
-app.models.predict("bd367be194cf45149e75f01d59f77ba7", "https://samples.clarifai.com/food.jpg").then(
-    function(response) {
-      console.log("MACHINE LEARNING IS GREAT");
-    },
-    function(err) {
-      console.log("MACHINE LEARNING DIDN'T WORK");
-    }
-  );
-*/
