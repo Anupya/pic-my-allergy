@@ -27,6 +27,8 @@ var File = FileAPI.file;
 var FileList = FileAPI.FileList;
 var FileReader = FileAPI.FileReader;
 
+var fuzzy = require('fuzzy');
+
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
@@ -45,6 +47,40 @@ app.get('/', function(req, res) {
 /* prints any submitted messages on the web app to the terminal */
 app.get('/allergy', function(req, res) {
 
+	MLApp.models.initModel('bd367be194cf45149e75f01d59f77ba7').then(
+		getModelOutputInfo
+	);
+
+	function getModelOutputInfo(model) {
+		model.getOutputInfo().then(
+			function(response) {
+				console.log(response);
+			},
+
+			function (err) {
+				console.log(err);
+			}
+		);
+	}
+	/* FUZZY 
+	var list = [
+	    {rompalu: 'baconing', zibbity: 'simba'}
+	  , {rompalu: 'narwhal' , zibbity: 'mufasa'}
+	  , {rompalu: 'a mighty bear canoe', zibbity: 'saddam hussein'}
+	];
+	var options = {
+	    pre: '<'
+	  , post: '>'
+	  , extract: function(el) { return el.rompalu; }
+	};
+	var results = fuzzy.filter('bcn', list, options);
+	var matches = results.map(function(el) { return el.string; });
+	console.log(matches);
+	*/
+
+
+
+	/*
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
 	var commaSeparatedAllergies = req.query.allergies.toString();
@@ -58,6 +94,8 @@ app.get('/allergy', function(req, res) {
 
 	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
 	res.redirect('/');
+	*/
+
 })
 
 /* reset */
@@ -73,7 +111,7 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
-app.post('/upload', function(req, res){ /* use https://github.com/mattyork/fuzzy to get user input */
+app.post('/upload', function(req, res){
 
 	console.log("IN app.post('/upload', ...)");
 	

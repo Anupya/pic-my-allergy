@@ -1,17 +1,82 @@
 <html>
-<h1>
+<title>
 	Pic My Allergy
-</h1>
-<body>
+</title>
+<head>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="https://cdn.rawgit.com/mattyork/fuzzy/master/lib/fuzzy.js"></script>
 	<form action='allergy'>
+		<!--
 		List your allergies (separated by commas): 
 		<br>
 		Ex: tomatoes, eggs, peanuts
 		<br><br>
-		<textarea type='text' name="allergies"></textarea>
+		 <textarea type='text' name="allergies"></textarea> -->
 		<br>
-		<input type='submit' value='Submit'>
+
+		<!--get a list of all the food items in clarifai food model api
+			store it in JSON file
+			display these in a drop-down, that shows 6 choices at a time, scrollable
+			selecting the drop down and clicking 'add' should add it to allergies JSON file
+
+		--> 
+			
+		<script type="text/javascript">
+			var foods = [ 
+			"potato",
+			"tomatoes",
+			"spinach",
+			"teriyaki",
+			"chicken"
+			];
+
+			function listFood() {
+				var search = $('#search').val();
+				console.log("Search: " + search);
+
+				var options = {
+					pre: "<b>",
+					post: "</b>"
+				}
+				var filtered = fuzzy.filter(search, foods, options);
+
+				// process the results to extract the strings
+				var newFood = filtered.map(function(el) {
+					return '<li>' + el.string + '</li>';
+				});
+
+				$('#foods').html(newFood.join(''));
+			}
+
+			$(function() {
+		      // List the initial characters
+		      listFood();
+
+		      // Filter the characters on each change of the textbox
+		      $('#search').keyup(function() {
+		      	listFood();
+		      	console.log("TYPING...");
+
+		      });
+
+		    });
+
+		</script>
+
+		<style>
+			b {
+				color: blue;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h2> Search food items </h2>
+		<input type="text" id="search" class="search"></input>
+		<ul id="foods">
+		</ul>
+
+		<!-- <input type='submit' value='Submit'> -->
 	</form>
 	<br>
 
