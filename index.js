@@ -47,37 +47,23 @@ app.get('/', function(req, res) {
 /* prints any submitted messages on the web app to the terminal */
 app.get('/allergy', function(req, res) {
 
-	MLApp.models.initModel('bd367be194cf45149e75f01d59f77ba7').then(
-		getModelOutputInfo
-	);
+	/* add the allergy to allergies.json */
 
-	function getModelOutputInfo(model) {
-		model.getOutputInfo().then(
-			function(response) {
-				console.log(response);
-			},
-
-			function (err) {
-				console.log(err);
-			}
-		);
-	}
-	/* FUZZY 
-	var list = [
-	    {rompalu: 'baconing', zibbity: 'simba'}
-	  , {rompalu: 'narwhal' , zibbity: 'mufasa'}
-	  , {rompalu: 'a mighty bear canoe', zibbity: 'saddam hussein'}
-	];
-	var options = {
-	    pre: '<'
-	  , post: '>'
-	  , extract: function(el) { return el.rompalu; }
-	};
-	var results = fuzzy.filter('bcn', list, options);
-	var matches = results.map(function(el) { return el.string; });
-	console.log(matches);
+	/* create array of all selected items 
+		push to allergies.json
 	*/
 
+	var input = $('.selectize-input')[0];
+	var numAllergies = document.querySelectorAll('.item').length;
+	var allergyArr = new Array(numAllergies);
+
+	console.log("data-value[0]: " + $('.item').attr('data-value'));
+
+	for (var i = 0; i < numAllergies; i++) {
+		allergyArr.push($('.item').attr('data-value'));
+	}
+
+	
 
 
 	/*
