@@ -26,29 +26,53 @@
 			</select>
 		</label>
 
-		<input type='submit' value='Add'>
+		<br>
+		<input type='submit' value='Update'>
 
 	</form>
 
+	<form action='reset'>
+		<input type='submit' value='Clear'>
+	</form>
+	
+	<br>
+
+	<form id='frmUploader' action='upload' method='post' enctype="multipart/form-data">
+		<h3> Upload your image here </h3>
+		<input id="the-file-input" type='file' name="imgUploader" onchange="renderImage(this.files[0])"> 
+		<p id="preview"></p>
+		<script>
+			function renderImage (file) { // using HTML5 File API which reduces load on the server
+				var reader = new FileReader();
+
+				reader.onload = function(event) {
+					the_url = event.target.result;
+					console.log("the_url: " + the_url);
+					$('#preview').html("Preview: <br><br><img src='" + the_url + "'" + "style='max-width:175px;max-length:175px' />");
+				}
+
+				console.log("file: " + file);
+
+				reader.readAsDataURL(file);
+			}
+		</script>
+		<br><br>
+		<input id="upload" type='submit' value='Upload' onchange="renderImage(this.files[0])">
+	</form>
+
+	<form id="amIAllergic" action='amIAllergic' method='post'>
+		<input type="submit" value="Am I allergic?">
+	</form>
+
 	<script>
-		
+
 		$(function() {
 			$('select').selectize({});
 		});
 
-		var foods = '';
-		$.getJSON("foods.json", function(json) {
-			var foods = json;
-		});
-
-		document.write("foods <br>");
-		document.write(foods);
-
 		window.onload = populateSelect();
 
 		function populateSelect() {
-			document.write("INSIDE populateSelect<br>");
-			document.write("yoooooooooo<br>");
 
 			/*
 			var foods = require('./foods.json');
@@ -3012,51 +3036,41 @@
 				ele.innerHTML = ele.innerHTML +
                 '<option value="' + foods[i]['foods'] + '">' + foods[i]['foods'] + '</option>';
 			}
+
+		}
+
+		/* get selected values and store them in array */
+		var allergiesArr = new Array();
+
+		document.onclick = function() {
+			allergiesArr = [];
+			var el = document.getElementById('sel');
+
+			$("#sel option").each(function()
+			{
+				allergiesArr.push($(this).val());
+				console.log("allergiesArr: " + allergiesArr);
+			});
+
+			// convert array into json object
+			var jsonObj = {};
+			for (var i = 0; i < allergiesArr.length; i++) {
+				jsonObj["allergies" + (i+1)] = allergiesArr[i];
+			}
+
+			console.log(jsonObj);
+
+			var jsonObjStr = JSON.stringify(jsonObj);
+			var url = 'jsonObj:allergies/json;charset=utf8,' + encodeURIComponent(jsonObj);
+			window.open(url, '_blank');
+			window.focus(); 
+
+			// write to JSON file
+			// fs.writeFileSync('allergies.json', JSON.stringify(messages));
 		}
 
 	</script>
 
-	<form action='reset'>
-		<h3> My allergies </h3>
-		<ul>
-			<!-- separate them based on commas -->
-			{{#each allergies}} <!-- syntax for for loop -->
-				<li>
-					{{this.allergies}}
-				</li>
-			{{/each}}
-		</ul>
-		<input type='submit' value='Clear'>
-	</form>
-	
-	<br>
-
-	<form id='frmUploader' action='upload' method='post' enctype="multipart/form-data">
-		<h3> Upload your image here </h3>
-		<input id="the-file-input" type='file' name="imgUploader" onchange="renderImage(this.files[0])"> 
-		<p id="preview"></p>
-		<script>
-			function renderImage (file) { // using HTML5 File API which reduces load on the server
-				var reader = new FileReader();
-
-				reader.onload = function(event) {
-					the_url = event.target.result;
-					console.log("the_url: " + the_url);
-					$('#preview').html("Preview: <br><br><img src='" + the_url + "'" + "style='max-width:175px;max-length:175px' />");
-				}
-
-				console.log("file: " + file);
-
-				reader.readAsDataURL(file);
-			}
-		</script>
-		<br><br>
-		<input id="upload" type='submit' value='Upload' onchange="renderImage(this.files[0])">
-	</form>
-
-	<form id="amIAllergic" action='amIAllergic' method='post'>
-		<input type="submit" value="Am I allergic?">
-	</form>
 
 </body>
 </html>

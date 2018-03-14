@@ -8,6 +8,11 @@ const MLApp = new Clarifai.App({
 var express = require('express');
 var app = express();
 
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { window } = new JSDOM(`<!DOCTYPE html>`);
+const $ = require('jQuery')(window);
+
 /* pass our app into http */
 var http = require('http').Server(app);
 
@@ -27,7 +32,9 @@ var File = FileAPI.file;
 var FileList = FileAPI.FileList;
 var FileReader = FileAPI.FileReader;
 
-var fuzzy = require('fuzzy');
+/* web scraping */
+var rp = require('request-promise');
+var cheerio = require('cheerio');
 
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
@@ -44,45 +51,68 @@ app.get('/', function(req, res) {
 	});
 })
 
-/* prints any submitted messages on the web app to the terminal */
-app.get('/allergy', function(req, res) {
+/* ADD */
+app.get ('/allergy', function(req, res) {
 
-	/* add the allergy to allergies.json */
+	var options = {
+		uri: 'http://localhost:3000/',
+		transform: function(body) {
+			return cheerio.load(body);
+		}
+	};
 
-	/* create array of all selected items 
-		push to allergies.json
-	*/
+	/* request-promise */
+	rp(options)
+		.then(($) => {
+			console.log($);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
 
-	var input = $('.selectize-input')[0];
-	var numAllergies = document.querySelectorAll('.item').length;
-	var allergyArr = new Array(numAllergies);
+	var allergies = new Array();
+	console.log("AFTER ALLERGIES ARRAY HAS BEEN CREATED");
 
-	console.log("data-value[0]: " + $('.item').attr('data-value'));
+	console.log("if body exists, !=0, if does not, 0: " + $('head').length);
+	console.log("if body exists, !=0, if does not, 0: " + $('body').length);
+	console.log("if body exists, !=0, if does not, 0: " + $('div').length);
+	console.log("if body exists, !=0, if does not, 0: " + $('form').length);
+	console.log("if h1 exists, !=0, if does not, 0: " + $('body > h1').length);
+	console.log("if select exists, !=0, if does not, 0: " + $('select').length);
+	console.log("if #sel exists, !=0, if does not, 0: " + $('#sel').length);
+	console.log("if .selectize-input exists, !=0, if does not, 0: " + $('.selectize-input').length);
+	console.log("if .item exists, !=0, if does not, 0: " + $('.item').length);
 
-	for (var i = 0; i < numAllergies; i++) {
-		allergyArr.push($('.item').attr('data-value'));
-	}
+	$('.item').each(
+		function(i) {
+			console.log("INSIDE FOR LOOP");
+			//console.log($(this).innerText());
+			allergies[i] = $(this).innerText();
+		}
+	);
 
+	console.log("allergies[0]: " + allergies[0]);
+
+	// write to allergies.json
 	
+	// fs.writeFileSync('allergies.json', JSON.stringify(messages));
 
+	res.redirect('/');
 
 	/*
-	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
+	$('.selectize-input').filter(function() {
+		var data = $(this);
+		console.log("data.children()" + data.children());
+		console.log("data.children().first()" + data.children().first());
+		console.log("data.children().first().text()" + data.children().first().text());
 
-	var commaSeparatedAllergies = req.query.allergies.toString();
-	var allergies_arr = commaSeparatedAllergies.split(',');
+		foods = data.children().first().text();
 
-	for (i = 0; i < allergies_arr.length; i++) {
-		if (allergies_arr[i]) { // if string is not empty
-			allergies.push({allergies: allergies_arr[i]});
-		}
-	}
-
-	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
-	res.redirect('/');
+		json.foods = foods;
+	})
 	*/
-
 })
+
 
 /* reset */
 app.get('/reset', function(req, res) {

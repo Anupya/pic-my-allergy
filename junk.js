@@ -87,3 +87,46 @@ function getModelOutputInfo(model) {
 	);
 }
 */
+
+
+/* prints any submitted messages on the web app to the terminal */
+app.get('/allergy', function(req, res) {
+
+	/* add the allergy to allergies.json */
+
+	/* create array of all selected items 
+		push to allergies.json
+	*/
+
+	var foods = JSON.parse(foods);
+	
+	var input = $('.selectize-input')[0];
+	var numAllergies = document.querySelectorAll('.item').length;
+	var allergyArr = new Array(numAllergies);
+
+	console.log("data-value[0]: " + $('.item').attr('data-value'));
+
+	for (var i = 0; i < numAllergies; i++) {
+		allergyArr.push($('.item').attr('data-value'));
+	}
+
+	
+
+
+	/*
+	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
+
+	var commaSeparatedAllergies = req.query.allergies.toString();
+	var allergies_arr = commaSeparatedAllergies.split(',');
+
+	for (i = 0; i < allergies_arr.length; i++) {
+		if (allergies_arr[i]) { // if string is not empty
+			allergies.push({allergies: allergies_arr[i]});
+		}
+	}
+
+	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
+	res.redirect('/');
+	*/
+
+})
