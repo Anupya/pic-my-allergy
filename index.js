@@ -7,6 +7,7 @@ const MLApp = new Clarifai.App({
 /* define our application and instantiate Express */
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
@@ -24,7 +25,6 @@ var path = require('path');
 
 /* store responses using FileSystem */
 var fs = require('fs');
-
 var formidable = require('formidable');
 var rimraf = require('rimraf');
 var FileAPI = require('file-api');
@@ -36,6 +36,8 @@ var FileReader = FileAPI.FileReader;
 var rp = require('request-promise');
 var cheerio = require('cheerio');
 
+app.use(bodyParser.urlencoded({extended: false }));
+app.use(bodyParser.json());
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
@@ -51,66 +53,24 @@ app.get('/', function(req, res) {
 	});
 })
 
-/* ADD */
+/* Update JSON file with allergy list */
 app.get ('/allergy', function(req, res) {
+	console.log("INSIDE ALLERGY");
 
-	var options = {
-		uri: 'http://localhost:3000/',
-		transform: function(body) {
-			return cheerio.load(body);
-		}
-	};
+	console.log("req.query.sel: ");
+	console.log(req.query.sel); // array
+	console.log(req.query.sel.length);
 
-	/* request-promise */
-	rp(options)
-		.then(($) => {
-			console.log($);
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
-	var allergies = new Array();
-	console.log("AFTER ALLERGIES ARRAY HAS BEEN CREATED");
+	for (var i = 0; i < req.query.sel.length; i++) {
+		allergies.push({allergies: req.query.sel[i]});
+	}
 
-	console.log("if body exists, !=0, if does not, 0: " + $('head').length);
-	console.log("if body exists, !=0, if does not, 0: " + $('body').length);
-	console.log("if body exists, !=0, if does not, 0: " + $('div').length);
-	console.log("if body exists, !=0, if does not, 0: " + $('form').length);
-	console.log("if h1 exists, !=0, if does not, 0: " + $('body > h1').length);
-	console.log("if select exists, !=0, if does not, 0: " + $('select').length);
-	console.log("if #sel exists, !=0, if does not, 0: " + $('#sel').length);
-	console.log("if .selectize-input exists, !=0, if does not, 0: " + $('.selectize-input').length);
-	console.log("if .item exists, !=0, if does not, 0: " + $('.item').length);
-
-	$('.item').each(
-		function(i) {
-			console.log("INSIDE FOR LOOP");
-			//console.log($(this).innerText());
-			allergies[i] = $(this).innerText();
-		}
-	);
-
-	console.log("allergies[0]: " + allergies[0]);
-
-	// write to allergies.json
-	
-	// fs.writeFileSync('allergies.json', JSON.stringify(messages));
+	// write to JSON file
+	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
 
 	res.redirect('/');
-
-	/*
-	$('.selectize-input').filter(function() {
-		var data = $(this);
-		console.log("data.children()" + data.children());
-		console.log("data.children().first()" + data.children().first());
-		console.log("data.children().first().text()" + data.children().first().text());
-
-		foods = data.children().first().text();
-
-		json.foods = foods;
-	})
-	*/
 })
 
 
@@ -273,6 +233,8 @@ app.post('/amIAllergic', function(req, res) {
 	);
 
 });
+
+module.exports = app;
 
 /* host the website */
 http.listen(3000, function() {

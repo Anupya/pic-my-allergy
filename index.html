@@ -20,11 +20,11 @@
 
 		--> 
 
-		<label> Allergies
-			<select id="sel" multiple>
-				<option value=""> None </option>
-			</select>
-		</label>
+		<label> Allergies </label>
+		<select id="sel" name="sel" multiple>
+			<option value=""> None </option>
+		</select>
+		
 
 		<br>
 		<input type='submit' value='Update'>
@@ -3037,36 +3037,6 @@
                 '<option value="' + foods[i]['foods'] + '">' + foods[i]['foods'] + '</option>';
 			}
 
-		}
-
-		/* get selected values and store them in array */
-		var allergiesArr = new Array();
-
-		document.onclick = function() {
-			allergiesArr = [];
-			var el = document.getElementById('sel');
-
-			$("#sel option").each(function()
-			{
-				allergiesArr.push($(this).val());
-				console.log("allergiesArr: " + allergiesArr);
-			});
-
-			// convert array into json object
-			var jsonObj = {};
-			for (var i = 0; i < allergiesArr.length; i++) {
-				jsonObj["allergies" + (i+1)] = allergiesArr[i];
-			}
-
-			console.log(jsonObj);
-
-			var jsonObjStr = JSON.stringify(jsonObj);
-			var url = 'jsonObj:allergies/json;charset=utf8,' + encodeURIComponent(jsonObj);
-			window.open(url, '_blank');
-			window.focus(); 
-
-			// write to JSON file
-			// fs.writeFileSync('allergies.json', JSON.stringify(messages));
 		}
 
 	</script>
