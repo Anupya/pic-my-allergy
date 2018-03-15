@@ -32,9 +32,7 @@ var File = FileAPI.file;
 var FileList = FileAPI.FileList;
 var FileReader = FileAPI.FileReader;
 
-/* web scraping */
-var rp = require('request-promise');
-var cheerio = require('cheerio');
+var JSAlert = require("js-alert");
 
 app.use(bodyParser.urlencoded({extended: false }));
 app.use(bodyParser.json());
@@ -43,6 +41,8 @@ app.engine('html', hbs.__express);
 
 /* default local host */
 app.get('/', function(req, res) {
+
+	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
 	/* SHOW THE ALLERGIES */
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
@@ -53,7 +53,8 @@ app.get('/', function(req, res) {
 
 	res.render(__dirname + '/index.html', {
 		/* going to display the messages */
-		'allergies': allergies
+		'allergies': allergies,
+		'foods': foods
 	});
 
 	//res.sendFile(__dirname + "/index.html");
@@ -65,6 +66,7 @@ app.get ('/allergy', function(req, res) {
 	// empty the file + store file contents in allergies
 	fs.writeFileSync('allergies.json', '[]', function() {})
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
+	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
 	for (var i = 0; i < req.query.sel.length; i++) {
 		allergies.push({allergies: req.query.sel[i]});
@@ -85,83 +87,35 @@ app.get('/reset', function(req, res) {
 	res.redirect('/');
 })
 
-app.post('/upload', function(req, res){
+app.get('/amIAllergic', function(req, res) {
 
-	console.log("IN app.post('/upload', ...)");
-	
-	// clear the uploads directory before uploading this new photo
-	rimraf('./uploads/*', function() {});
+	var allergiesJSON = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
+	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
-    // create an incoming form object
-    var form = new formidable.IncomingForm();
+	/* if anything in allergies list, matches tag array, output it to screen */
+	var atleast1 = "Please enter atleast 1 allergy.";
 
-    // DO NOT COMMENT THIS OUT
-    form.uploadDir = path.join(__dirname, '/uploads');
-    form.keepExtensions = false;
+	if (allergiesJSON.length == 0) {
+		res.render(__dirname + '/index.html', {
+			/* going to display the messages */
+			'allergies': allergiesJSON,
+			'foods': foods,
+			'atleast1': atleast1
+		});
+	}
 
-    form.on('progress', function(bytesReceived, bytesExpected) {
-    	// write your own progress bar here later
-    	console.log("IN PROGRESS");
-
-    	if (bytesReceived > 100000) {
-    		console.log("TOO BIG!");
-    		return false;
-    	}
-    	
-    });
-
-    // rename the file to its original name after it has been uploaded
-    form.on('file', function(field, file) {
-    	console.log("file.size: " + file.size);
-    	if (file.size > 2000000) {
-    		console.log("exceeded file size: " + file.size);
-
-    		// inform html code
-    		res.redirect('/');
-    	}
-
-        console.log("INSIDE FORM.ON");
-
-  	    if ((file.name.split('.').pop() != 'jpg') && 
-  		         (file.name.split('.').pop() != 'png'))  {
-  	    	res.end("Sorry, we only accept JPGs and PNGs");
-  	    }
-
-  	    else {
-  		    var ext = "png";
-  			console.log("FILE IS VALID");
-			fs.rename(file.path, path.join(form.uploadDir, ("image." + ext)));
-  	    }
-    });
-
-    form.on('error', function(err) {
-        console.log('An error has occurred: \n' + err);
-    });
-
-    form.on('end', function() {
-    	console.log("SUCCESS");
-    	// print success message on screen
-    });
-
-    // parse the incoming request containing the form data
-    form.parse(req);
-
-    res.redirect('/');
-});
-
-app.post('/amIAllergic', function(req, res) {
-	console.log("INSIDE AMIALLERGIC");
+	var canteatbecause = {};
+	var dangerArr = [];
+	var message;
 
 	/* MACHINE LEARNING */
-	MLApp.models.predict ("bd367be194cf45149e75f01d59f77ba7", "http://www.coca-colacompany.com/content/dam/journey/us/en/private/2017/04/BravesFood1.rendition.940.456.jpg").then(
+	MLApp.models.predict ("bd367be194cf45149e75f01d59f77ba7", req.query.url).then(
 	    function(response) {
 	    	// get the data from API response and do something here
-	    	console.log("Model Name: " + response.rawData.outputs[0].model.name);
 
 	    	if (response.rawData.outputs[0].data.hasOwnProperty("concepts")) {
-	    		console.log("CONCEPTS TAG EXISTS");
+	    		
 	    		dataArray = response.rawData.outputs[0].data.concepts;
-	    		console.log("DATAARRAY.LENGTH: " + dataArray.length);
 
 	    		var tagArray = new Array(dataArray.length);
 	    		var probabilityArray = new Array(dataArray.length);
@@ -169,57 +123,61 @@ app.post('/amIAllergic', function(req, res) {
 	    		for (var num = 0; num < dataArray.length; num++) {
 	    			tagArray[num] = dataArray[num].name;
 	    			probabilityArray[num] = dataArray[num].value;
-	    			console.log("tagArray[" + num + "] = " + tagArray[num]);
-	    			console.log("probabilityArray[" + num + "] = " + probabilityArray[num]);
+	    			//console.log("tagArray[" + num + "] = " + tagArray[num]);
+	    			//console.log("probabilityArray[" + num + "] = " + probabilityArray[num]);
 	    		}
 
-	    		var allergiesJSON = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
-
-	    		/* if anything in allergies list, matches tag array, output it to screen */
+	    		// if anything in allergies list, matches tag array, output it to screen 
 
 	    		var allergies = new Array(allergiesJSON.length);
 	    		for (var i = 0; i < allergiesJSON.length; i++) {
 	    			allergies[i] = allergiesJSON[i].allergies;
-	    			allergies[i].trim();
-	    			console.log("allergies[" + i + "]: " + allergies[i]);
 	    		}
 
 	    		var edible = true;
-	    		var canteatbecause = {};
 
-	    		/* compare allergies and tagArray */
+	    		/* I am storing this information in 3 places because I will work on keeping the best 
+	    		implementation, a JSON object later */
 
-	    		// ERROR: does not work because JSON.parse creates a leading whitespace so it
-	    		// does not match the string and does not give an allergy alert
+	    		/* 1. DANGER.JSON */
+	    		fs.writeFileSync('danger.json', '[]', function() {})
+				var danger = JSON.parse(fs.readFileSync('danger.json', 'utf-8'));
 
-	    		for (var a = 0; a < tagArray.length; a++) {
-	    			console.log("-----------------------");
-	    			console.log("a = " + a);
-	    			for (var b = 0; b < allergies.length; b++) {
-	    				if (tagArray[a] == allergies[b]) {
-	    					console.log("YOU ARE ALLERGIC TO: " + tagArray[a]);
-	    					canteatbecause[tagArray[a]] = probabilityArray[a];
-	    					console.log("# reasons you cant eat this: " + Object.keys(canteatbecause).length);
-	    					edible = false;
-	    				}
-	    				console.log("TAG: " + tagArray[a] + " & ALLERGY: " + allergies[b]);
-	    			}
-	    		}
+				for (var a = 0; a < tagArray.length; a++) {
+					for (var b = 0; b < allergies.length; b++) {
+						if (tagArray[a] == allergies[b]) {
+							danger.push({food: tagArray[a], probability: probabilityArray[a]*100});
+							edible = false;
+						}
+					}
+
+				}
+
+				fs.writeFileSync('danger.json', JSON.stringify(danger));
 
 	    		if (edible) {
+	    			message = "This food is good to eat!";
 	    			console.log("IT IS EDIBLE");
 	    		}
 	    		else {
-	    			console.log("IT IS NOT EDIBLE BECAUSE");
-	    			console.log("# reasons you cant eat this: " + Object.keys(canteatbecause).length);
-	    			
-	    			for (var i = 0; i < Object.keys(canteatbecause).length; i++) {
-	    				console.log("Your food has a " + Math.round(Object.values(canteatbecause)[i]*100) + 
-	    					"% chance of having " + Object.keys(canteatbecause)[i]);
+	    			message = "Uh oh. You may be allergic to something in this picture.";
+	    			console.log("IT IS NOT EDIBLE");
+	    			console.log("# reasons you cant eat this: " + danger.length);
+
+	    			for (var i = 0; i < danger.length; i++) {
+	    				console.log("Your food has a " + Math.round(danger[i].probability) + 
+	    					"% chance of having " + danger[i].food);
 	    			}
 	    		}
+
+				res.render(__dirname + '/index.html', {
+					/* going to display the messages */
+					'foods': foods,
+					'allergies': allergiesJSON,
+					'message': message,
+					'danger': danger
+				});
 	    	}
-	    	res.redirect('/');
 	      
 	    },
 
@@ -228,8 +186,9 @@ app.post('/amIAllergic', function(req, res) {
 	    	console.log(err);
 
 	    }
-	);
 
+	);
+	
 });
 
 module.exports = app;

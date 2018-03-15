@@ -10,34 +10,43 @@
 </head>
 
 <body>
-	<form action='allergy'>
+	<p style='color: blue'>{{message}}</p>
 
-
-		<!--get a list of all the food items in clarifai food model api
-			store it in JSON file
-			display these in a drop-down, that shows 6 choices at a time, scrollable
-			selecting the drop down and clicking 'add' should add it to allergies JSON file
-
-		--> 
-
-		<label> Allergies </label>
-		<select id="sel" name="sel" multiple>
-			<option value=""> None </option>
-		</select>
-		
-		<br>
-		<h3> My allergies </h3>
-
-		<p id="noalg"></p> <!-- LATER: display a message if no allergies listed -->
-
+	<div id="dangerFoods">
 		<ul>
-			{{#each allergies}}
+			{{#each danger}}
 				<li>
-					{{this.allergies}}
+					There is a <b>{{this.probability}}% </b> chance that this food has <b> {{this.food}}. </b>
 				</li>
 			{{/each}}
 		</ul>
-		<input type='submit' value='Update'>
+	</div>
+	
+	<form action='allergy'>
+
+		<label> Allergies </label>
+		<select id="sel" name="sel" multiple>
+			{{#each foods}}
+				<option value="{{this.foods}}">{{this.foods}}</option>
+
+			{{/each}}
+		</select>
+		<br>
+		<input type='submit' value='Create & Save'>
+
+		<br><br><br><br>
+		<h3> My allergies </h3>
+		<p style='color: red'> {{atleast1}} </p>
+
+		<div id="myAllergies">
+			<ul>
+				{{#each allergies}}
+					<li>
+						{{this.allergies}}
+					</li>
+				{{/each}}
+			</ul>
+		</div>
 
 	</form>
 
@@ -47,31 +56,23 @@
 	
 	<br>
 
-	<form id='frmUploader' action='upload' method='post' enctype="multipart/form-data">
-		<h3> Upload your image here </h3>
-		<input id="the-file-input" type='file' name="imgUploader" onchange="renderImage(this.files[0])"> 
-		<p id="preview"></p>
-		<script>
-			function renderImage (file) { // using HTML5 File API which reduces load on the server
-				var reader = new FileReader();
-
-				reader.onload = function(event) {
-					the_url = event.target.result;
-					console.log("the_url: " + the_url);
-					$('#preview').html("Preview: <br><br><img src='" + the_url + "'" + "style='max-width:175px;max-length:175px' />");
-				}
-
-				console.log("file: " + file);
-
-				reader.readAsDataURL(file);
-			}
-		</script>
+	<form id="amIAllergic" action='amIAllergic'>
+	<!-- <form id="amIAllergic">  -->
+		<p> Please enter an image URL: </p>
+		<input type="url" name="url" id="url"><br>
+		<img id="imgPreview" />
 		<br><br>
-		<input id="upload" type='submit' value='Upload' onchange="renderImage(this.files[0])">
-	</form>
-
-	<form id="amIAllergic" action='amIAllergic' method='post'>
+		<script>
+	        $(document).ready(function(){
+	        	$('#url').change(function() {
+	        		$('#imgPreview').attr('src', $('#url').val());
+	        	});
+	        });
+    	</script>
 		<input type="submit" value="Am I allergic?">
+
+	<!-- Make url allergies work first -->
+
 	</form>
 
 	<script>
@@ -79,13 +80,13 @@
 		$(function() {
 			$('select').selectize({});
 		});
-		
+
+		/*
 		window.onload = populateSelect();
 
 		function populateSelect() {
 
-			document.write("IN populateSelect" + "<br>");
-
+			
 			var foods =
 			[  
 			  {  
@@ -3026,19 +3027,18 @@
 			    "foods":"zucchini"
 			  }
 			]
-
-			document.write("foods has been processed");
+			
 
 			var ele = document.getElementById('sel');
 
 			for (var i = 0; i < foods.length; i++) {
 
 				ele.innerHTML = ele.innerHTML +
-                '<option value="' + foods[i]['foods'] + '">' + foods[i]['foods'] + '</option>';
+				'<option value="' + foods[i].foods + '">' + foods[i].foods + '</option';
+                //'<option value="' + foods[i]['foods'] + '">' + foods[i]['foods'] + '</option>';
 			}
-
 		}
-
+		*/
 
 	</script>
 
