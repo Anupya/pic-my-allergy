@@ -47,20 +47,23 @@ app.get('/', function(req, res) {
 	/* SHOW THE ALLERGIES */
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
+	if (allergies.length == 0) {
+		allergies = [ {allergies: 'You have selected no allergies'} ];
+	}
+
 	res.render(__dirname + '/index.html', {
 		/* going to display the messages */
 		'allergies': allergies
 	});
+
+	//res.sendFile(__dirname + "/index.html");
 })
 
 /* Update JSON file with allergy list */
 app.get ('/allergy', function(req, res) {
-	console.log("INSIDE ALLERGY");
 
-	console.log("req.query.sel: ");
-	console.log(req.query.sel); // array
-	console.log(req.query.sel.length);
-
+	// empty the file + store file contents in allergies
+	fs.writeFileSync('allergies.json', '[]', function() {})
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
 	for (var i = 0; i < req.query.sel.length; i++) {
@@ -81,11 +84,6 @@ app.get('/reset', function(req, res) {
 	fs.writeFile('allergies.json', '[]', function() {})
 	res.redirect('/');
 })
-
-/* upload */
-app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/index.html");
-});
 
 app.post('/upload', function(req, res){
 

@@ -25,8 +25,18 @@
 			<option value=""> None </option>
 		</select>
 		
-
 		<br>
+		<h3> My allergies </h3>
+
+		<p id="noalg"></p> <!-- LATER: display a message if no allergies listed -->
+
+		<ul>
+			{{#each allergies}}
+				<li>
+					{{this.allergies}}
+				</li>
+			{{/each}}
+		</ul>
 		<input type='submit' value='Update'>
 
 	</form>
@@ -69,22 +79,12 @@
 		$(function() {
 			$('select').selectize({});
 		});
-
+		
 		window.onload = populateSelect();
 
 		function populateSelect() {
 
-			/*
-			var foods = require('./foods.json');
-			*/
-			
-			/*
-			var foods;
-			fetch("foods.json").then(
-				function(response) {
-					foods = response.json();
-			});
-			*/
+			document.write("IN populateSelect" + "<br>");
 
 			var foods =
 			[  
@@ -3038,6 +3038,7 @@
 			}
 
 		}
+
 
 	</script>
 
