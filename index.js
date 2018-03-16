@@ -68,8 +68,23 @@ app.get ('/allergy', function(req, res) {
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
-	for (var i = 0; i < req.query.sel.length; i++) {
-		allergies.push({allergies: req.query.sel[i]});
+	if (req.query.sel == null) {
+		res.render(__dirname + '/index.html', {
+			/* going to display the messages */
+			'allergies': allergies,
+			'foods': foods
+		});
+
+		return;
+	}
+	if (req.query.sel[0].length == 1)
+	{
+		allergies.push({allergies: req.query.sel});
+	}
+	else {
+		for (var i = 0; i < req.query.sel.length; i++) {
+			allergies.push({allergies: req.query.sel[i]});
+		}
 	}
 
 	// write to JSON file
@@ -92,16 +107,33 @@ app.get('/amIAllergic', function(req, res) {
 	var allergiesJSON = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
-	/* if anything in allergies list, matches tag array, output it to screen */
-	var atleast1 = "Please enter atleast 1 allergy.";
-
+	// if no allergies selected
 	if (allergiesJSON.length == 0) {
+
+		var atleast1 = "Please enter atleast 1 allergy.";
 		res.render(__dirname + '/index.html', {
-			/* going to display the messages */
+		
 			'allergies': allergiesJSON,
 			'foods': foods,
 			'atleast1': atleast1
 		});
+
+		return;
+	}
+
+	// if url is not valid
+
+	if (!(req.query.url.match(/(jpeg|jpg|gif|png)$/))) {
+
+		var badImage = 'Your url does not end with jpeg, jpg, gif or png.';
+		res.render(__dirname + '/index.html', {
+		
+			'allergies': allergiesJSON,
+			'foods': foods,
+			'badImage': badImage
+		});
+
+		return;
 	}
 
 	var canteatbecause = {};
@@ -123,7 +155,7 @@ app.get('/amIAllergic', function(req, res) {
 	    		for (var num = 0; num < dataArray.length; num++) {
 	    			tagArray[num] = dataArray[num].name;
 	    			probabilityArray[num] = dataArray[num].value;
-	    			//console.log("tagArray[" + num + "] = " + tagArray[num]);
+	    			console.log("tagArray[" + num + "] = " + tagArray[num]);
 	    			//console.log("probabilityArray[" + num + "] = " + probabilityArray[num]);
 	    		}
 
@@ -136,17 +168,13 @@ app.get('/amIAllergic', function(req, res) {
 
 	    		var edible = true;
 
-	    		/* I am storing this information in 3 places because I will work on keeping the best 
-	    		implementation, a JSON object later */
-
-	    		/* 1. DANGER.JSON */
 	    		fs.writeFileSync('danger.json', '[]', function() {})
 				var danger = JSON.parse(fs.readFileSync('danger.json', 'utf-8'));
 
 				for (var a = 0; a < tagArray.length; a++) {
 					for (var b = 0; b < allergies.length; b++) {
 						if (tagArray[a] == allergies[b]) {
-							danger.push({food: tagArray[a], probability: probabilityArray[a]*100});
+							danger.push({food: tagArray[a], probability: Math.round(probabilityArray[a]*100)});
 							edible = false;
 						}
 					}
