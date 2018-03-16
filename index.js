@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { window } = new JSDOM(`<!DOCTYPE html>`);
-const $ = require('jQuery')(window);
+const $ = require('jquery')(window);
 
 /* pass our app into http */
 var http = require('http').Server(app);
