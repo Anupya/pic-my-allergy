@@ -36,6 +36,9 @@ var JSAlert = require("js-alert");
 
 app.use(bodyParser.urlencoded({extended: false }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '/public')))
+
+
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
@@ -48,7 +51,15 @@ app.get('/', function(req, res) {
 	var allergies = JSON.parse(fs.readFileSync('allergies.json', 'utf-8'));
 
 	if (allergies.length == 0) {
-		allergies = [ {allergies: 'You have selected no allergies'} ];
+
+		var noallergies = 'You have selected no allergies.';
+		res.render(__dirname + '/index.html', {
+			/* going to display the messages */
+			'noallergies': noallergies,
+			'foods': foods
+		});
+
+		return;
 	}
 
 	res.render(__dirname + '/index.html', {
@@ -56,8 +67,6 @@ app.get('/', function(req, res) {
 		'allergies': allergies,
 		'foods': foods
 	});
-
-	//res.sendFile(__dirname + "/index.html");
 })
 
 /* Update JSON file with allergy list */
@@ -69,9 +78,11 @@ app.get ('/allergy', function(req, res) {
 	var foods = JSON.parse(fs.readFileSync('foods.json', 'utf-8'));
 
 	if (req.query.sel == null) {
+
+		var noallergies = 'You have selected no allergies.';
 		res.render(__dirname + '/index.html', {
 			/* going to display the messages */
-			'allergies': allergies,
+			'noallergies': noallergies,
 			'foods': foods
 		});
 
@@ -90,7 +101,7 @@ app.get ('/allergy', function(req, res) {
 	// write to JSON file
 	fs.writeFileSync('allergies.json', JSON.stringify(allergies));
 
-	res.redirect('/');
+	res.redirect('/#show');
 })
 
 
@@ -155,7 +166,7 @@ app.get('/amIAllergic', function(req, res) {
 	    		for (var num = 0; num < dataArray.length; num++) {
 	    			tagArray[num] = dataArray[num].name;
 	    			probabilityArray[num] = dataArray[num].value;
-	    			console.log("tagArray[" + num + "] = " + tagArray[num]);
+	    			//console.log("tagArray[" + num + "] = " + tagArray[num]);
 	    			//console.log("probabilityArray[" + num + "] = " + probabilityArray[num]);
 	    		}
 
@@ -184,26 +195,25 @@ app.get('/amIAllergic', function(req, res) {
 				fs.writeFileSync('danger.json', JSON.stringify(danger));
 
 	    		if (edible) {
-	    			message = "This food is good to eat!";
-	    			console.log("IT IS EDIBLE");
+	    			message = "YES";
+	    			//console.log("IT IS EDIBLE");
 	    		}
 	    		else {
-	    			message = "Uh oh. You may be allergic to something in this picture.";
-	    			console.log("IT IS NOT EDIBLE");
-	    			console.log("# reasons you cant eat this: " + danger.length);
+	    			message = "NO";
+	    			//console.log("IT IS NOT EDIBLE");
+	    			//console.log("# reasons you cant eat this: " + danger.length);
 
 	    			for (var i = 0; i < danger.length; i++) {
-	    				console.log("Your food has a " + Math.round(danger[i].probability) + 
-	    					"% chance of having " + danger[i].food);
+	    				//console.log("Your food has a " + Math.round(danger[i].probability) + 
+	    					//"% chance of having " + danger[i].food);
 	    			}
 	    		}
 
-				res.render(__dirname + '/index.html', {
+				res.render(__dirname + '/results.html', {
 					/* going to display the messages */
-					'foods': foods,
-					'allergies': allergiesJSON,
 					'message': message,
-					'danger': danger
+					'danger': danger,
+					'url': req.query.url
 				});
 	    	}
 	      

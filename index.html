@@ -1,70 +1,89 @@
 <html>
-<h1>
-	Pic My Allergy
-</h1>
 <head>
+	<h1>
+		Pic My Allergy
+	</h1>
+	<br><br><br>
+	<h4>A simple app that tells you if you might be allergic to something in a picture of your food using machine learning</h4>
+	<hr class="line" />
+
+	<div class='invisiblebtn'></div>
+
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="https://cdn.rawgit.com/selectize/selectize.js/master/dist/js/standalone/selectize.js"></script>
-	<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/selectize/selectize.js/master/dist/css/selectize.css" />
+	<link rel="stylesheet" type="text/css" href="selectize.css" />
+	<link rel="stylesheet" type="text/css" href="main.css" />
 
 </head>
 
 <body>
-	<p style='color: blue'>{{message}}</p>
-
-	<div id="dangerFoods">
-		<ul>
-			{{#each danger}}
-				<li>
-					There is a <b>{{this.probability}}% </b> chance that the image has <b> {{this.food}}. </b>
-				</li>
-			{{/each}}
-		</ul>
-	</div>
 
 	<form action='allergy'>
 
-		<label> Allergies </label>
-		<br><br>
-		<select id="sel" name="sel" multiple>
-			{{#each foods}}
-				<option value="{{this.foods}}">{{this.foods}}</option>
+		<div class="pick">
+			<h3> Pick your allergies. </h3>
+			<br>
+			<p class='errmsg'> {{noallergies}} </p>
+			<p class='errmsg'>{{badImage}}</p>
+			<p class='errmsg'> {{atleast1}} </p>
+			<select id="sel" name="sel" multiple>
+				{{#each foods}}
+					<option value="{{this.foods}}">{{this.foods}}</option>
 
-			{{/each}}
-		</select>
-		<br>
-		<input type='submit' value='Create & Save'>
-
-		<br><br><br><br>
-		<h3> My allergies </h3>
-		<p style='color: red'> {{atleast1}} </p>
-
-		<div id="myAllergies">
-			<ul>
-				{{#each allergies}}
-					<li>
-						{{this.allergies}}
-					</li>
 				{{/each}}
-			</ul>
+			</select>
+			<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+			<input class='btn' type='submit' id='createandsave' value='Create & Save'>
+		</div>
+
+		<a href="#show">Link1</a>
+		<a href="#add">Link2</a>
+
+		<div class="show" id="show">
+			<hr class="line" /><br><br><br>
+			<h3> Here are your allergies. </h3><br><br><br>
+			
+			<div id="myAllergies">
+				<ul>
+					{{#each allergies}}
+						<li>
+							{{this.allergies}}
+						</li>
+					{{/each}}
+				</ul>
+			</div>
 		</div>
 
 	</form>
 
 	<form action='reset'>
-		<input type='submit' value='Clear'>
+		<input class='btn' type='submit' id='clear' value='Clear'>
 	</form>
+
+	<input class='btn' type='submit' id='nextToAdd' value='Next'>
+
+	
 	
 	<br>
 
 	<form id="amIAllergic" action='amIAllergic'>
 	<!-- <form id="amIAllergic">  -->
-		<p> Please enter an image URL: </p>
-		<p style='color: red'>{{badImage}}</p>
-		<input type="url" name="url" id="url"><br><br>
-		<img id="imgPreview" />
+		<hr class="line" />
 
-		<br><br>
+		<div class="add" id="add">
+			<h3>Now enter an image URL. </h3><br>
+			
+			<input type="url" name="url" id="url"><br><br><br><br>
+			<img id="imgPreview" /><br><br><br>
+		</div>
+
+		<br><br><br><br><br><br>
+
+    	<div class="ready">
+    		<br><br><br>
+			<input class='btn' id='finalBtn' type="submit" value="Am I allergic?">
+		</div>
+
 		<script>
 	        $(document).ready(function(){
 	        	$('#url').change(function() {
@@ -85,21 +104,31 @@
 	        		}
 	        	});
 	        });
+
+	        $(function() {
+				$('select').selectize({});
+			});
+
+			$("#createandsave").click(function() {
+			    $('html,body').animate({
+			        scrollTop: $(".show").offset().top},
+			        'slow');
+			});
+			$("#nextToAdd").click(function() {
+			    $('html,body').animate({
+			        scrollTop: $("#url").offset().top},
+			        'slow');
+			});
+			$("#nextToReady").click(function() {
+			    $('html,body').animate({
+			        scrollTop: $(".ready").offset().top},
+			        'slow');
+			});
+
     	</script>
-		<input type="submit" value="Am I allergic?">
 
 	<!-- Make url allergies work first -->
 
 	</form>
-
-	<script>
-
-		$(function() {
-			$('select').selectize({});
-		});
-
-	</script>
-
-
 </body>
 </html>

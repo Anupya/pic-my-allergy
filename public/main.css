@@ -1,0 +1,169 @@
+h1 {
+	font-family: 'Open Sans', 'Trebuchet MS', 'Arial';
+	font-size: 25px;
+	position: relative;
+    left: 0px;
+    right: 0px;
+    font-style: normal;
+    font-weight: 1200;
+    letter-spacing: 20px;
+    text-transform: uppercase;
+}
+
+h4 {
+	font-family: 'Open Sans', 'Trebuchet MS', 'Arial';
+	font-size: 16px;
+	position: relative;
+    left: 0px;
+    right: 0px;
+    font-style: normal;
+    font-weight: 100;
+}
+body {
+	background: #FFA500;
+	color: white;
+	font-family: 'Open Sans', 'Trebuchet MS', 'Arial';
+	text-align: center;
+	position: relative;
+	top: 70px;
+}
+
+#myAllergies ul {
+	margin: 0 auto;
+}
+#myAllergies li {
+	list-style: none;
+	background: #cc880c;
+	color: #f2f2f2;
+	display: inline-block;
+	padding: 10px 10px 10px 10px;
+}
+#dangerFoods ul {
+	margin: 0 auto;
+}
+#dangerFoods li {
+	list-style: none;
+	background: red;
+	color: #f2f2f2;
+	font-weight: 100;
+	display: inline-block;
+	padding: 10px 10px 10px 10px;
+	margin: 0px auto;
+}
+#successFoods {
+	background: green;
+	padding: 10px 10px 10px 10px;
+	margin: 0px auto;
+	color: #f2f2f2;
+	width: 40%;
+}
+#url {
+	height: 25px;
+	width: 50%;
+	font-size: 18px;
+	padding: 10px 5px 10px 10px;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	border-top: none;
+	border-bottom: 1px solid #DDD;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,.39), 0 -1px 1px #FFF, 0 1px 0 #FFF;
+}
+.line {
+	border-bottom: solid 1px #f2f2f2;
+	border-top-width: 0px;
+	animation-name: line_animation;
+	animation-duration: 2s;
+	animation-timing-function: linear;
+	position: relative;
+	top: 25px;
+	width: 60%;
+}
+
+h3 {
+	left: 0px;
+    right: 0px;
+    font-size: 22px;
+    font-weight: 500;
+    color: black;
+}
+
+.pick, .show, .add {
+	position: relative;
+	top: 50px;
+	height: 500px;
+}
+.show {
+	height: 400px;
+}
+.add {
+	height: 250px;
+}
+.btn {
+	background: white;
+	cursor: pointer;
+	padding: 12px 40px;
+	display: inline-block;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-weight: 700;
+	outline: none;
+	border: none;
+	color: black;
+	overflow: hidden;
+	box-shadow: black;
+	position: relative;
+	bottom: 10px;
+	animation: fadein 2s;
+	transition-delay: 2s;
+	border-radius: 10px;
+}
+
+
+#clear {
+	padding: 8px 20px;
+	font-size: 12px;
+}
+
+a {
+	color: none;
+	text-decoration: none;
+	visibility: hidden;
+}
+
+.btn:hover {
+	color: white;
+	background: black;
+}
+
+#finalBtn {
+	padding: 20px 80px;
+}
+.errmsg {
+	color: red;
+	font-size: 14px;
+}
+
+#imgPreview {
+	animation: fadein 1s;
+}
+
+/* ANIMATIONS */
+@keyframes line_animation {
+	from {
+		width: 0%;
+		opacity: 0;
+	}
+	to {
+		width: 60%;
+		opacity: 1;
+	}
+}
+
+@keyframes fadein {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

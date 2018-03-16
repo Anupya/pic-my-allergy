@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<h1>
+			Pic My Allergy
+		</h1>
+		<br><br><br>
+		<h4>A simple app that tells you if you might be allergic to something in a picture of your food using machine learning</h4>
+		<hr class="line" /><br><br>
+
+		<h3>Here are your results:</h3>
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="https://cdn.rawgit.com/selectize/selectize.js/master/dist/js/standalone/selectize.js"></script>
+		<link rel="stylesheet" type="text/css" href="selectize.css" />
+		<link rel="stylesheet" type="text/css" href="main.css" />
+
+	</head>
+
+	<body>
+		<div class="results">
+			<img id='imgPreview' /><br><br><br>
+			<div class="explanation">
+
+				<div id="dangerFoods">
+					<ul>
+						{{#each danger}}
+							<li>
+								There is a <b><u>{{this.probability}}</u>% </b> chance that the image has <b> {{this.food}}. </b>
+							</li>
+						{{/each}}
+					</ul>
+				</div>
+
+			</div>
+			<!-- HTML5 image preview -->
+			<script>
+				$('#imgPreview').attr('src', '{{url}}');
+
+				console.log("URL: " + '{{url}}');
+
+				if ('{{message}}' == 'YES') {
+					$('.explanation').append("<div id='successFoods'>There is a very high chance you are not allergic to anything in this picture.</div>")
+				}
+
+			</script>
+		</div>
+		<br><br>
+		<form action='/'>
+			<input class='btn' id='again' type='submit' value='Again'>
+		</form>
+	</body>
+</html>
+
