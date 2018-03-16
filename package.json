@@ -4,8 +4,7 @@
   "description": "A website that tells if you are allergic to the food in the picture you have uploaded or linked via URL.",
   "main": "index.js",
   "engines": {
-    "node": "8.9.4",
-    "npm":"5.7.1"
+    "node": "8.9.4"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -33,7 +32,7 @@
     "type": "git",
     "url": "git+https://github.com/anupya/pic-my-allergy.git"
   },
-  "author": "",
+  "author": "Anupya Pamidimukkala",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/anupya/pic-my-allergy/issues"
