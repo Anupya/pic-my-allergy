@@ -194,6 +194,6 @@ app.get('/amIAllergic', function(req, res) {
 module.exports = app;
 
 /* host the website */
-http.listen(3000, function() {
-	console.log("Running on localhost:3000");
-})
+http.listen(process.env.PORT || 3000, function() {
+	console.log("Running on", http.address().port);
+});
