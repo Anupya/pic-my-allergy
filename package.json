@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A website that tells if you are allergic to the food in the picture you have uploaded or linked via URL.",
   "main": "index.js",
+  "engines": {
+    "node": "8.9.4",
+    "npm":"5.7.1"
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "clarifai": "^2.6.0",
@@ -23,7 +27,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "start":"node index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
