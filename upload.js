@@ -1,4 +1,4 @@
-/* wanted to allow uploading files, but let;s get URL working first */
+/* wanted to allow uploading files, but let's get URL working first */
 
 /* HTML CODE
 

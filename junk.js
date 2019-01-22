@@ -1,3 +1,10 @@
+/*
+
+This contains unused code. I didn't want to delete this in case it became
+useful later.
+
+*/
+
 /* search */
 
 /*
